@@ -14,3 +14,7 @@ Get-WMIMonitorInfo -ComputerName EH-406B8-01
 -ComputerName
 ```
 Accepts a string for a target computer to query.
+
+## Sources
+* https://support.moonpoint.com/os/windows/PowerShell/monitor_mfg.php
+* https://community.spiceworks.com/topic/321045-is-there-any-way-to-determine-the-monitor-size-attached-to-a-computer
