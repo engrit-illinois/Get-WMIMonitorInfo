@@ -49,13 +49,19 @@ function Get-WMIMonitorInfo {
     )
     $output = New-Object System.Collections.ArrayList
 
-    $WMIMonitorID = Get-CimInstance -ClassName WMIMonitorID -Namespace root\wmi -ComputerName $ComputerName
+    if(Test-Connection -ComputerName $ComputerName -Count 1 -Quiet) {
+        Write-Verbose "Successfully pinged $ComputerName"
+        
+        $WMIMonitorID = Get-CimInstance -ClassName WMIMonitorID -Namespace root\wmi -ComputerName $ComputerName
 
-    foreach($Monitor in $WMIMonitorID) {
-        Write-Verbose $Monitor
-        $Member = Build-ArrayObject -WMIMonitorID $Monitor
-        $output.Add($Member) | Out-Null
+        foreach($Monitor in $WMIMonitorID) {
+            Write-Verbose $Monitor
+            $Member = Build-ArrayObject -WMIMonitorID $Monitor
+            $output.Add($Member) | Out-Null
+        }
+        $output
+    }else{
+        Write-Error "Could not ping computer."
     }
-    $output
 }
 Export-ModuleMember Get-WMIMonitorInfo
