@@ -46,23 +46,29 @@ function Build-ArrayObject {
 function Get-WMIMonitorInfo {
     [CmdletBinding()]
     param(
-        [string]$ComputerName
+        [Parameter(ParameterSetName="RemoteSet")]
+        [string]$ComputerName,
+        [Parameter(ParameterSetName="LocalSet")]
+        [switch]$Local
     )
     $output = New-Object System.Collections.ArrayList
 
-    if(Test-Connection -ComputerName $ComputerName -Count 1 -Quiet) {
-        Write-Verbose "Successfully pinged $ComputerName"
-        
-        $WMIMonitorID = Get-CimInstance -ClassName WMIMonitorID -Namespace root\wmi -ComputerName $ComputerName
-
-        foreach($Monitor in $WMIMonitorID) {
-            Write-Verbose $Monitor
-            $Member = Build-ArrayObject -WMIMonitorID $Monitor
-            $output.Add($Member) | Out-Null
+    if($ComputerName){
+        if(Test-Connection -ComputerName $ComputerName -Count 1 -Quiet) {
+            Write-Verbose "Successfully pinged $ComputerName"
+        }else{
+            throw "Could not ping remote computer."
         }
-        $output
-    }else{
-        Write-Error "Could not ping computer."
+        $WMIMonitorID = Get-CimInstance -ClassName WMIMonitorID -Namespace root\wmi -ComputerName $ComputerName
+    }elseif($Local){
+        $WMIMonitorID = Get-CimInstance -ClassName WMIMonitorID -Namespace root\wmi
     }
+
+    foreach($Monitor in $WMIMonitorID) {
+        Write-Verbose $Monitor
+        $Member = Build-ArrayObject -WMIMonitorID $Monitor
+        $output.Add($Member) | Out-Null
+    }
+    $output
 }
 Export-ModuleMember Get-WMIMonitorInfo
