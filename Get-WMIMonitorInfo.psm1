@@ -18,6 +18,7 @@ function Get-Manufacturer {
         DEL {$output = "Dell"}
         HPN {$output = "HP"}
         HWP {$output = "HP"}
+        ACI {$output = "ASUS"}
     }
     $output
 }
