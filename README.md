@@ -20,3 +20,4 @@ Accepts a string for a target computer to query. If this is not supplied, the co
 ## Sources
 * https://support.moonpoint.com/os/windows/PowerShell/monitor_mfg.php
 * https://community.spiceworks.com/topic/321045-is-there-any-way-to-determine-the-monitor-size-attached-to-a-computer
+* https://superuser.com/questions/749243/detect-if-powershell-is-running-as-administrator
