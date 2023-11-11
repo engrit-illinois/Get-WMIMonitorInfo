@@ -80,10 +80,7 @@ function Build-ArrayObject {
 function Get-WMIMonitorInfo {
     [CmdletBinding()]
     param(
-        [Parameter(ParameterSetName="RemoteSet")]
-        [string]$ComputerName,
-        [Parameter(ParameterSetName="LocalSet")]
-        [switch]$Local
+        [string]$ComputerName
     )
 
     if(-not (Get-Module JoinModule)){
@@ -101,7 +98,7 @@ function Get-WMIMonitorInfo {
         }
         $WMIMonitorID =                 Get-CimInstance -Namespace root\wmi -ClassName WMIMonitorID -ComputerName $ComputerName
         $WmiMonitorBasicDisplayParams = Get-Ciminstance -Namespace root\wmi -ClassName WmiMonitorBasicDisplayParams -ComputerName $ComputerName
-    }elseif($Local){
+    }else{
         $WMIMonitorID =                 Get-CimInstance -ClassName WMIMonitorID -Namespace root\wmi
         $WmiMonitorBasicDisplayParams = Get-Ciminstance -Namespace root\wmi -ClassName WmiMonitorBasicDisplayParams
     }
