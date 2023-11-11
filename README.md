@@ -15,7 +15,7 @@ Get-WMIMonitorInfo -ComputerName EH-406B8-01
 ```powershell
 -ComputerName
 ```
-Accepts a string for a target computer to query.
+Accepts a string for a target computer to query. If this is not supplied, the command will run against the local computer instead.
 
 ## Sources
 * https://support.moonpoint.com/os/windows/PowerShell/monitor_mfg.php
