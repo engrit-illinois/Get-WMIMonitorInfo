@@ -100,8 +100,8 @@ function Get-WMIMonitorInfo {
 
     if(-not (Get-Module JoinModule)){
         Write-Verbose "JoinModule was not detected!"
-        if($PSVersionTable.PSVersion.Major -ge 7) {
-            Write-Verbose "PowerShell Core detected"
+        if($PSVersionTable.PSEdition -eq "Core") {
+            Write-Verbose "PowerShell Core detected, Installing JoinModule..."
             Install-Module JoinModule
         }else{
             if(([Security.Principal.WindowsPrincipal] `
