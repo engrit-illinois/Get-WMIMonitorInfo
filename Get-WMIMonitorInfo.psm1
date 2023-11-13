@@ -100,19 +100,18 @@ function Get-WMIMonitorInfo {
 
     if(-not (Get-Module JoinModule)){
         Write-Verbose "JoinModule was not detected!"
-        if($PSVersionTable.PSVersion.Major -lt 7) {
-            Write-Verbose "Running on normal PowerShell; Checking if we're running as Admin..."
+        if($PSVersionTable.PSVersion.Major -ge 7) {
+            Write-Verbose "PowerShell Core detected"
+            Install-Module JoinModule
+        }else{
             if(([Security.Principal.WindowsPrincipal] `
             [Security.Principal.WindowsIdentity]::GetCurrent() `
-            ).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {       # Check that we're running as Admin before installing the module
+            ).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
                 Write-Verbose "Admin check succeeded, Installing JoinModule..."
                 Install-Module JoinModule    
             }else{
                 throw "Need to be admin to install dependency JoinModule! Aborting operation."
             }
-        }else{ 
-            Write-Verbose "Installing JoinModule..."
-            Install-Module JoinModule
         }
     }
 
