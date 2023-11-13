@@ -56,7 +56,7 @@ function Measure-Ratio {
 
     $Ratio = [System.Math]::Round(($Horizontal/$Vertical),2)
     switch($Ratio){
-        {$_ -ge 1.75 -and $_ -le 1.80} {$Numerator = 16; $Denominator = 9}
+        {$_ -ge 1.70 -and $_ -le 1.80} {$Numerator = 16; $Denominator = 9}
         {$_ -ge 1.57 -and $_ -le 1.63} {$Numerator = 16; $Denominator = 10}
         {$_ -ge 1.20 -and $_ -le 1.40} {$Numerator = 4; $Denominator = 3}
     }
