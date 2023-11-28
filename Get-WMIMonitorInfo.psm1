@@ -124,15 +124,20 @@ function Get-WMIMonitorInfo {
         }else{
             throw "Could not ping remote computer."
         }
-        $WMIMonitorID =                 Get-CimInstance -Namespace root\wmi -ClassName WMIMonitorID -ComputerName $ComputerName
-        $WmiMonitorBasicDisplayParams = Get-Ciminstance -Namespace root\wmi -ClassName WmiMonitorBasicDisplayParams -ComputerName $ComputerName
+        $WMIMonitorID =                 Get-CimInstance -Namespace root\wmi -ClassName WMIMonitorID -ComputerName $ComputerName -ErrorAction SilentlyContinue
+        $WmiMonitorBasicDisplayParams = Get-Ciminstance -Namespace root\wmi -ClassName WmiMonitorBasicDisplayParams -ComputerName $ComputerName -ErrorAction SilentlyContinue
     }else{
-        $WMIMonitorID =                 Get-CimInstance -ClassName WMIMonitorID -Namespace root\wmi
-        $WmiMonitorBasicDisplayParams = Get-Ciminstance -Namespace root\wmi -ClassName WmiMonitorBasicDisplayParams
+        $WMIMonitorID =                 Get-CimInstance -ClassName WMIMonitorID -Namespace root\wmi -ErrorAction SilentlyContinue
+        $WmiMonitorBasicDisplayParams = Get-Ciminstance -Namespace root\wmi -ClassName WmiMonitorBasicDisplayParams -ErrorAction SilentlyContinue
     }
 
     # Join the two WMI Classes so they can be parsed together
-    $Combined = $WMIMonitorID | Join-Object $WmiMonitorBasicDisplayParams -On InstanceName,PSComputerName
+    if($WMIMonitorID -and $WmiMonitorBasicDisplayParams){
+        $Combined = $WMIMonitorID | Join-Object $WmiMonitorBasicDisplayParams -On InstanceName,PSComputerName
+    }else{
+        Write-Error "No result returned for Monitor Info. Does your target computer actually have monitors?"
+        break
+    }
 
     foreach($Monitor in $Combined) {
         Write-Verbose $Monitor
