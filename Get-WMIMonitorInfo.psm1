@@ -167,7 +167,7 @@ function Get-WMIMonitorInfo {
     }
 
     # Join the two WMI Classes so they can be parsed together
-    if($WMIMonitorID -and $WmiMonitorBasicDisplayParams){
+    if($WMIMonitorID -and $WmiMonitorBasicDisplayParams -and $WmiMonitorConnectionParams){
         $Combined = $WMIMonitorID | 
             Join-Object $WmiMonitorBasicDisplayParams -On InstanceName,PSComputerName |
             Join-Object $WmiMonitorConnectionParams -On InstanceName,PSComputerName
