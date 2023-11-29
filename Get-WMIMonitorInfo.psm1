@@ -71,6 +71,37 @@ function Measure-Ratio {
     }
 }
 
+function Get-VideoOutputTechnology {
+    param(
+        $Monitor
+    )
+
+    $output = $Monitor.VideoOutputTechnology
+
+    switch($output) {
+        -2  {"Unassigned"}
+        -1  {"Unknown"}
+        0   {"VGA"}
+        1   {"S-vidio"}
+        2   {"Composite Video"}
+        3   {"Component Video"}
+        4   {"DVI"}
+        5   {"HDMI"}
+        6   {"LVDS"}
+        8   {"D-Jpn"}
+        9   {"SDI"}
+        10  {"External DisplayPort"}
+        11  {"Embedded DisplayPort"}
+        12  {"External UDI"}
+        13  {"Embedded UDI"}
+        14  {"SDTV"}
+        15  {"Miracast"}
+        16  {"Wired Indirect Display"}
+        Default {$output}
+    }
+    
+}
+
 function Build-ArrayObject {
     param(
         $Monitor
@@ -86,6 +117,7 @@ function Build-ArrayObject {
         YearOfManufacture =         $Monitor.YearOfManufacture
         Size =                      Measure-Diagonal -Monitor $Monitor
         Ratio =                     Measure-Ratio -Monitor $Monitor
+        VideoOutputTechnology =     Get-VideoOutputTechnology -Monitor $Monitor
         PSComputerName =            $Monitor.PSComputerName
     }
     Write-Verbose $output
@@ -126,14 +158,18 @@ function Get-WMIMonitorInfo {
         }
         $WMIMonitorID =                 Get-CimInstance -Namespace root\wmi -ClassName WMIMonitorID -ComputerName $ComputerName -ErrorAction SilentlyContinue
         $WmiMonitorBasicDisplayParams = Get-Ciminstance -Namespace root\wmi -ClassName WmiMonitorBasicDisplayParams -ComputerName $ComputerName -ErrorAction SilentlyContinue
+        $WmiMonitorConnectionParams   = Get-CimInstance -Namespace root\wmi -ClassName WmiMonitorConnectionParams -ComputerName $ComputerName -ErrorAction SilentlyContinue
     }else{
         $WMIMonitorID =                 Get-CimInstance -ClassName WMIMonitorID -Namespace root\wmi -ErrorAction SilentlyContinue
         $WmiMonitorBasicDisplayParams = Get-Ciminstance -Namespace root\wmi -ClassName WmiMonitorBasicDisplayParams -ErrorAction SilentlyContinue
+        $WmiMonitorConnectionParams   = Get-CimInstance -Namespace root\wmi -ClassName WmiMonitorConnectionParams -ErrorAction SilentlyContinue
     }
 
     # Join the two WMI Classes so they can be parsed together
     if($WMIMonitorID -and $WmiMonitorBasicDisplayParams){
-        $Combined = $WMIMonitorID | Join-Object $WmiMonitorBasicDisplayParams -On InstanceName,PSComputerName
+        $Combined = $WMIMonitorID | 
+            Join-Object $WmiMonitorBasicDisplayParams -On InstanceName,PSComputerName |
+            Join-Object $WmiMonitorConnectionParams -On InstanceName,PSComputerName
     }else{
         Write-Error "No result returned for Monitor Info. Does your target computer actually have monitors?"
         break
