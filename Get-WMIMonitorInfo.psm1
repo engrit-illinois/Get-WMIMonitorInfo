@@ -143,7 +143,7 @@ function Get-WMIMonitorInfo {
                 Write-Verbose "Admin check succeeded, Installing JoinModule..."
                 Install-Module JoinModule    
             }else{
-                throw "Need to be admin to install dependency JoinModule! Aborting operation."
+                Write-Error "Need to be admin to install dependency JoinModule! Aborting operation."
             }
         }
     }
@@ -155,7 +155,7 @@ function Get-WMIMonitorInfo {
         if(Test-Connection -ComputerName $ComputerName -Count 1 -Quiet) {
             Write-Verbose "Successfully pinged $ComputerName"
         }else{
-            throw "Could not ping remote computer."
+            Write-Error "Could not ping remote computer $ComputerName."
         }
         $WMIMonitorID =                 Get-CimInstance -Namespace root\wmi -ClassName WMIMonitorID -ComputerName $ComputerName -ErrorAction SilentlyContinue
         $WmiMonitorBasicDisplayParams = Get-Ciminstance -Namespace root\wmi -ClassName WmiMonitorBasicDisplayParams -ComputerName $ComputerName -ErrorAction SilentlyContinue
@@ -172,8 +172,7 @@ function Get-WMIMonitorInfo {
             Join-Object $WmiMonitorBasicDisplayParams -On InstanceName,PSComputerName |
             Join-Object $WmiMonitorConnectionParams -On InstanceName,PSComputerName
     }else{
-        Write-Error "No result returned for Monitor Info. Does your target computer actually have monitors?"
-        break
+        Write-Error "No result returned for Monitor Info for $ComputerName. Does your target computer actually have monitors?"
     }
 
     foreach($Monitor in $Combined) {
