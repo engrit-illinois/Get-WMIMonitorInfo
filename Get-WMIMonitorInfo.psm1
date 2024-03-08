@@ -21,6 +21,7 @@ function Get-Manufacturer {
         ACI {$output = "ASUS"}
         WAC {$output = "Wacom"}
         TSB {$output = "Toshiba"}
+        VSC {$output = "ViewSonic"}
     }
     $output
 }
