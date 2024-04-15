@@ -183,4 +183,3 @@ function Get-WMIMonitorInfo {
     }
     $output
 }
-Export-ModuleMember Get-WMIMonitorInfo
