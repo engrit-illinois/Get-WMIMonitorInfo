@@ -1,130 +1,54 @@
-function Decode {
-    # Source: https://support.moonpoint.com/os/windows/PowerShell/monitor_mfg.php
-    If ($args[0] -is [System.Array]) {
-        [System.Text.Encoding]::ASCII.GetString($args[0])
-    }
-    Else {
-        "Not Found"
-    }
-}
+<#
+.SYNOPSIS
+    Short description
 
-function Get-Manufacturer {
-    param (
-        $Monitor
-    )
-    $output = Decode $Monitor.ManufacturerName
-    Write-Verbose "Raw decoded output for ManufacturerName is $output"
-    switch ($output) {
-        DEL {$output = "Dell"}
-        HPN {$output = "HP"}
-        HWP {$output = "HP"}
-        ACI {$output = "ASUS"}
-        WAC {$output = "Wacom"}
-        TSB {$output = "Toshiba"}
-        VSC {$output = "ViewSonic"}
-    }
-    $output
-}
+.DESCRIPTION
+    Long description
 
-function Measure-Diagonal {
-    param (
-        $Monitor
-    )
+.PARAMETER ParameterName
+    Description of parameter input
 
-    $Horizontal =   $Monitor | Select-Object -ExpandProperty MaxHorizontalImageSize
-    $Vertical =     $Monitor | Select-Object -ExpandProperty MaxVerticalImageSize
+.EXAMPLE
+    PS>
 
-    # Convert to Inches from CM
-    $Horizontal =   [System.Math]::Round(($Horizontal/2.54),2)
-    $Vertical =     [System.Math]::Round(($Vertical/2.54),2)
+    Example of how to use this cmdlet
 
-    # Pythagorean Theorem rounded to the nearest inch
-    $Diagonal = [System.Math]::Round([System.Math]::Sqrt([System.Math]::Pow($Horizontal,2) + [System.Math]::Pow($Vertical,2)),0)
-    $Diagonal
-}
+.EXAMPLE
+    PS>
 
-function Measure-Ratio {
-    param(
-        $Monitor
-    )
+    Another example of how to use this cmdlet
 
-    $Horizontal =   $Monitor | Select-Object -ExpandProperty MaxHorizontalImageSize
-    $Vertical =     $Monitor | Select-Object -ExpandProperty MaxVerticalImageSize
+.LINK
+    Any related function or website
 
-    # Convert to Inches from CM
-    $Horizontal =   [System.Math]::Round(($Horizontal/2.54),2)
-    $Vertical =     [System.Math]::Round(($Vertical/2.54),2)
+.NOTES
+    General notes
+#>
 
-    $Ratio = [System.Math]::Round(($Horizontal/$Vertical),2)
-    switch($Ratio){
-        {$_ -ge 1.70 -and $_ -le 1.85} {$Numerator = 16; $Denominator = 9}
-        {$_ -ge 1.57 -and $_ -le 1.63} {$Numerator = 16; $Denominator = 10}
-        {$_ -ge 1.20 -and $_ -le 1.40} {$Numerator = 4; $Denominator = 3}
-    }
 
-    if($Numerator -and $Denominator){
-        $output = "$($Numerator):$($Denominator)"
-    }
-    if($output){
-        $output
-    }else{
-        $Ratio
-    }
-}
+<#PSScriptInfo
+.VERSION 1.0.0
 
-function Get-VideoOutputTechnology {
-    param(
-        $Monitor
-    )
+.AUTHOR USERNAME
 
-    $output = $Monitor.VideoOutputTechnology
+.GUID be7e5b3f-2024-0415-1759-32afcca5c65a
 
-    switch($output) {
-        -2          {"Unassigned"}
-        -1          {"Unknown"}
-        0           {"VGA"}
-        1           {"S-vidio"}
-        2           {"Composite Video"}
-        3           {"Component Video"}
-        4           {"DVI"}
-        5           {"HDMI"}
-        6           {"LVDS"}
-        8           {"D-Jpn"}
-        9           {"SDI"}
-        10          {"External DisplayPort"}
-        11          {"Embedded DisplayPort"}
-        12          {"External UDI"}
-        13          {"Embedded UDI"}
-        14          {"SDTV"}
-        15          {"Miracast"}
-        16          {"Wired Indirect Display"}
-        2147483648  {"Internal Laptop Display"}
-        Default     {$output}
-    }
-    
-}
+.TAGS tags
 
-function Build-ArrayObject {
-    param(
-        $Monitor
-    )
-    $output = New-Object System.Collections.ArrayList
-    
-    $output = [PSCustomObject]@{
-        Manufacturer =              Get-Manufacturer -Monitor $Monitor
-        ProductCode =               Decode $Monitor.ProductCodeID
-        Serial =                    Decode $Monitor.SerialNumberID
-        Name =                      Decode $Monitor.UserFriendlyName
-        WeekOfManufacture =         $Monitor.WeekOfManufacture
-        YearOfManufacture =         $Monitor.YearOfManufacture
-        Size =                      Measure-Diagonal -Monitor $Monitor
-        Ratio =                     Measure-Ratio -Monitor $Monitor
-        VideoOutputTechnology =     Get-VideoOutputTechnology -Monitor $Monitor
-        PSComputerName =            $Monitor.PSComputerName
-    }
-    Write-Verbose $output
-    $output
-}
+.ICONURI
+
+.EXTERNALMODULEDEPENDENCIES
+
+.RELEASENOTES
+    1.0.0 - Initial Release
+#>
+
+[CmdletBinding()]
+
+param(
+    [Parameter()]
+    [PSObject] $ParameterName
+)
 
 function Get-WMIMonitorInfo {
     [CmdletBinding()]
