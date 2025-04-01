@@ -12,6 +12,9 @@ function Get-Manufacturer {
         WAC {$output = "Wacom"}
         TSB {$output = "Toshiba"}
         VSC {$output = "ViewSonic"}
+        BBY {$output = "Best Buy"}
+        CEI {$output = "Crestron"}
+        ATL {$output = "Atlona"}
     }
     $output
 }
