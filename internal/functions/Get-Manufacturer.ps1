@@ -15,6 +15,7 @@ function Get-Manufacturer {
         BBY {$output = "Best Buy"}
         CEI {$output = "Crestron"}
         ATL {$output = "Atlona"}
+        PNR {$output = "Planar"}
     }
     $output
 }
