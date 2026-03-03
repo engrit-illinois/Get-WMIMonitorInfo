@@ -25,6 +25,7 @@ function Get-VideoOutputTechnology {
         15          {"Miracast"}
         16          {"Wired Indirect Display"}
         2147483648  {"Internal Laptop Display"}
+        4294967295  {"Remote Desktop"}
         Default     {$output}
     }
     
