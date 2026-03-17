@@ -1,21 +1,18 @@
 function Build-ArrayObject {
-    param(
-        $Monitor
-    )
-    $output = New-Object System.Collections.ArrayList
-    
-    $output = [PSCustomObject]@{
-        Manufacturer =              Get-Manufacturer -Monitor $Monitor
-        ProductCode =               Decode $Monitor.ProductCodeID
-        Serial =                    Decode $Monitor.SerialNumberID
-        Name =                      Decode $Monitor.UserFriendlyName
-        WeekOfManufacture =         $Monitor.WeekOfManufacture
-        YearOfManufacture =         $Monitor.YearOfManufacture
-        Size =                      Measure-Diagonal -Monitor $Monitor
-        Ratio =                     Measure-Ratio -Monitor $Monitor
-        VideoOutputTechnology =     Get-VideoOutputTechnology -Monitor $Monitor
-        PSComputerName =            $Monitor.PSComputerName
-    }
-    Write-Verbose $output
-    $output
+	param(
+		$Monitor
+	)
+	
+	[PSCustomObject]@{
+		PSComputerName =		($Monitor.PSComputerName).Trim()
+		Manufacturer =			(Get-Manufacturer $Monitor.ManufacturerName).Trim()
+		ProductCode =			(Decode $Monitor.ProductCodeID).Trim()
+		Serial =				(Decode $Monitor.SerialNumberID).Trim()
+		Name =					(Decode $Monitor.UserFriendlyName).Trim()
+		WeekOfManufacture =		("$($Monitor.WeekOfManufacture)").Trim()
+		YearOfManufacture =		("$($Monitor.YearOfManufacture)").Trim()
+		Size =					(Measure-Diagonal $Monitor.DisplayParams.MaxHorizontalImageSize $Monitor.DisplayParams.MaxVerticalImageSize).Trim()
+		Ratio =					(Measure-Ratio $Monitor.DisplayParams.MaxHorizontalImageSize $Monitor.DisplayParams.MaxVerticalImageSize).Trim()
+		VideoOutputTechnology =	(Get-VideoOutputTechnology $Monitor.ConnectionParams.VideoOutputTechnology).Trim()
+	}
 }

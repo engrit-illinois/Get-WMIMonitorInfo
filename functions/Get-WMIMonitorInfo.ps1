@@ -1,28 +1,28 @@
 <#
 .SYNOPSIS
-    Short description
+	Short description
 
 .DESCRIPTION
-    Long description
+	Long description
 
 .PARAMETER ParameterName
-    Description of parameter input
+	Description of parameter input
 
 .EXAMPLE
-    PS>
+	PS>
 
-    Example of how to use this cmdlet
+	Example of how to use this cmdlet
 
 .EXAMPLE
-    PS>
+	PS>
 
-    Another example of how to use this cmdlet
+	Another example of how to use this cmdlet
 
 .LINK
-    Any related function or website
+	Any related function or website
 
 .NOTES
-    General notes
+	General notes
 #>
 
 
@@ -40,70 +40,69 @@
 .EXTERNALMODULEDEPENDENCIES
 
 .RELEASENOTES
-    1.0.0 - Initial Release
+	1.0.0 - Initial Release
 #>
 
 [CmdletBinding()]
 
 param(
-    [Parameter()]
-    [PSObject] $ParameterName
+	[Parameter()]
+	[PSObject] $ParameterName
 )
 
 function Get-WMIMonitorInfo {
-    [CmdletBinding()]
-    param(
-        [string]$ComputerName
-    )
-
-    if(-not (Get-Module JoinModule)){
-        Write-Verbose "JoinModule was not detected!"
-        if($PSVersionTable.PSEdition -eq "Core") {
-            Write-Verbose "PowerShell Core detected, Installing JoinModule..."
-            Install-Module JoinModule
-        }else{
-            if(([Security.Principal.WindowsPrincipal] `
-            [Security.Principal.WindowsIdentity]::GetCurrent() `
-            ).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-                Write-Verbose "Admin check succeeded, Installing JoinModule..."
-                Install-Module JoinModule    
-            }else{
-                Write-Error "Need to be admin to install dependency JoinModule! Aborting operation."
-            }
-        }
-    }
-
-    # Initialize the output arraylist
-    $output = New-Object System.Collections.ArrayList
-
-    if($ComputerName){
-        if(Test-Connection -ComputerName $ComputerName -Count 1 -Quiet) {
-            Write-Verbose "Successfully pinged $ComputerName"
-        }else{
-            Write-Error "Could not ping remote computer $ComputerName."
-        }
-        $WMIMonitorID =                 Get-CimInstance -Namespace root\wmi -ClassName WMIMonitorID -ComputerName $ComputerName -ErrorAction SilentlyContinue
-        $WmiMonitorBasicDisplayParams = Get-Ciminstance -Namespace root\wmi -ClassName WmiMonitorBasicDisplayParams -ComputerName $ComputerName -ErrorAction SilentlyContinue
-        $WmiMonitorConnectionParams   = Get-CimInstance -Namespace root\wmi -ClassName WmiMonitorConnectionParams -ComputerName $ComputerName -ErrorAction SilentlyContinue
-    }else{
-        $WMIMonitorID =                 Get-CimInstance -ClassName WMIMonitorID -Namespace root\wmi -ErrorAction SilentlyContinue
-        $WmiMonitorBasicDisplayParams = Get-Ciminstance -Namespace root\wmi -ClassName WmiMonitorBasicDisplayParams -ErrorAction SilentlyContinue
-        $WmiMonitorConnectionParams   = Get-CimInstance -Namespace root\wmi -ClassName WmiMonitorConnectionParams -ErrorAction SilentlyContinue
-    }
-
-    # Join the two WMI Classes so they can be parsed together
-    if($WMIMonitorID -and $WmiMonitorBasicDisplayParams -and $WmiMonitorConnectionParams){
-        $Combined = $WMIMonitorID | 
-            Join-Object $WmiMonitorBasicDisplayParams -On InstanceName,PSComputerName |
-            Join-Object $WmiMonitorConnectionParams -On InstanceName,PSComputerName
-    }else{
-        Write-Error "No result returned for Monitor Info for $ComputerName. Does your target computer actually have monitors?"
-    }
-
-    foreach($Monitor in $Combined) {
-        Write-Verbose $Monitor
-        $Member = Build-ArrayObject -Monitor $Monitor
-        $output.Add($Member) | Out-Null
-    }
-    $output
+	[CmdletBinding()]
+	param(
+		[string]$ComputerName
+	)
+	
+	# Initialize the output arraylist
+	$output = New-Object System.Collections.ArrayList
+	
+	$cimParams = @{
+		"ErrorAction" = "Stop"
+		"Namespace" = "root\wmi"
+	}
+	
+	if($ComputerName) {
+		
+		# Bail if the computer can't be pinged
+		if(Test-Connection -ComputerName $ComputerName -Count 1 -Quiet) {
+			Write-Verbose "Successfully pinged $ComputerName"
+		}
+		else {
+			Throw "Could not ping remote computer $ComputerName."
+		}
+		
+		$cimParams.ComputerName = $ComputerName
+	}
+	
+	# Get all monitor info for all monitors
+	try {
+		$id = Get-CimInstance -ClassName WMIMonitorID @cimParams
+		$displayParams = Get-Ciminstance -ClassName WmiMonitorBasicDisplayParams @cimParams
+		$connectionParams = Get-CimInstance -ClassName WmiMonitorConnectionParams @cimParams
+	}
+	catch {
+		Throw "Error gathering monitor info from computer `"$ComputerName`"!"
+	}
+	
+	# Loop through each monitor's ID info object
+	$monitors = $id | ForEach-Object {
+		$monitor = $_
+		
+		# Add this monitor's display param info object as a child object
+		$monitorDisplayParams = $displayParams | Where { $_.InstanceName -eq $monitor.InstanceName }
+		$monitor | Add-Member -NotePropertyName "DisplayParams" -NotePropertyValue $monitorDisplayParams
+		
+		# Add this monitor's connection param info object as a child object
+		$monitorConnectionParams = $connectionParams | Where { $_.InstanceName -eq $monitor.InstanceName }
+		$monitor | Add-Member -NotePropertyName "ConnectionParams" -NotePropertyValue $monitorConnectionParams
+		
+		$monitor
+	}
+	
+	$monitors | ForEach-Object {
+		Build-ArrayObject -Monitor $_
+	}
 }

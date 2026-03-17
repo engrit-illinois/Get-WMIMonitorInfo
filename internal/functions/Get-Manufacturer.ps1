@@ -1,21 +1,18 @@
 function Get-Manufacturer {
-    param (
-        $Monitor
-    )
-    $output = Decode $Monitor.ManufacturerName
-    Write-Verbose "Raw decoded output for ManufacturerName is $output"
-    switch ($output) {
-        DEL {$output = "Dell"}
-        HPN {$output = "HP"}
-        HWP {$output = "HP"}
-        ACI {$output = "ASUS"}
-        WAC {$output = "Wacom"}
-        TSB {$output = "Toshiba"}
-        VSC {$output = "ViewSonic"}
-        BBY {$output = "Best Buy"}
-        CEI {$output = "Crestron"}
-        ATL {$output = "Atlona"}
-        PNR {$output = "Planar"}
-    }
-    $output
+	param (
+		$ManufacturerName
+	)
+	switch(Decode $ManufacturerName) {
+		"DEL" { "Dell" }
+		"HPN" { "HP" }
+		"HWP" { "HP" }
+		"ACI" { "ASUS" }
+		"WAC" { "Wacom" }
+		"TSB" { "Toshiba" }
+		"VSC" { "ViewSonic" }
+		"BBY" { "Best Buy" }
+		"CEI" { "Crestron" }
+		"ATL" { "Atlona" }
+		"PNR" { "Planar" }
+	}
 }
