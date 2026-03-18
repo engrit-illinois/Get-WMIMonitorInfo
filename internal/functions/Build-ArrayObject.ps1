@@ -20,5 +20,6 @@ function Build-ArrayObject {
 		Size					= Measure-Diagonal $Monitor.DisplayParams.MaxHorizontalImageSize $Monitor.DisplayParams.MaxVerticalImageSize
 		Ratio					= Measure-Ratio $Monitor.DisplayParams.MaxHorizontalImageSize $Monitor.DisplayParams.MaxVerticalImageSize
 		VideoOutputTechnology	= Get-VideoOutputTechnology $Monitor.ConnectionParams.VideoOutputTechnology
+		RawMonitorInfo			= $Monitor
 	}
 }
