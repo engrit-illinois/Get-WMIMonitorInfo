@@ -4,15 +4,21 @@ function Build-ArrayObject {
 	)
 	
 	[PSCustomObject]@{
-		PSComputerName =		($Monitor.PSComputerName).Trim()
-		Manufacturer =			(Get-Manufacturer $Monitor.ManufacturerName).Trim()
-		ProductCode =			(Decode $Monitor.ProductCodeID).Trim()
-		Serial =				(Decode $Monitor.SerialNumberID).Trim()
-		Name =					(Decode $Monitor.UserFriendlyName).Trim()
-		WeekOfManufacture =		("$($Monitor.WeekOfManufacture)").Trim()
-		YearOfManufacture =		("$($Monitor.YearOfManufacture)").Trim()
-		Size =					(Measure-Diagonal $Monitor.DisplayParams.MaxHorizontalImageSize $Monitor.DisplayParams.MaxVerticalImageSize).Trim()
-		Ratio =					(Measure-Ratio $Monitor.DisplayParams.MaxHorizontalImageSize $Monitor.DisplayParams.MaxVerticalImageSize).Trim()
-		VideoOutputTechnology =	(Get-VideoOutputTechnology $Monitor.ConnectionParams.VideoOutputTechnology).Trim()
+		PSComputerName			= $Monitor.PSComputerName
+		Manufacturer			= Get-Manufacturer $Monitor.ManufacturerName
+		#ProductCodeRaw			= $Monitor.ProductCodeID
+		#ProductCodeRawFull		= "$($Monitor.ProductCodeID -join ",")"
+		ProductCode				= Decode $Monitor.ProductCodeID
+		#SerialRaw				= $Monitor.SerialNumberID
+		#SerialRawFull			= "$($Monitor.SerialNumberID -join ",")"
+		Serial					= Decode $Monitor.SerialNumberID
+		#NameRaw				= $Monitor.UserFriendlyName
+		#NameRawFull			= "$($Monitor.UserFriendlyName -join ",")"
+		Name					= Decode $Monitor.UserFriendlyName
+		WeekOfManufacture		= "$($Monitor.WeekOfManufacture)"
+		YearOfManufacture		= "$($Monitor.YearOfManufacture)"
+		Size					= Measure-Diagonal $Monitor.DisplayParams.MaxHorizontalImageSize $Monitor.DisplayParams.MaxVerticalImageSize
+		Ratio					= Measure-Ratio $Monitor.DisplayParams.MaxHorizontalImageSize $Monitor.DisplayParams.MaxVerticalImageSize
+		VideoOutputTechnology	= Get-VideoOutputTechnology $Monitor.ConnectionParams.VideoOutputTechnology
 	}
 }
